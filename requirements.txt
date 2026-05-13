@@ -1,0 +1,20 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: CC-BY-NC-4.0
+
+# Core dependencies
+boto3>=1.36.0
+loguru>=0.7.3
+tenacity>=9.1.2
+pymupdf>=1.24.0
+pillow>=10.0.0
+amazon-textract-textractor>=1.8.0
+pydantic>=2.0.0
+
+# DeepSeek OCR dependencies (for multilingual documents, requires GPU with CUDA)
+# Note: flash-attn must be installed separately - see README for instructions
+torch>=2.7.0
+transformers>=4.48.0
+tokenizers>=0.20.3
+addict>=2.4.0
+easydict>=1.10
+einops>=0.6.0
