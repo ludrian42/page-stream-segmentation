@@ -1,12 +1,23 @@
-notebooks/charts/
 
-data/
-datasets/
+# OCR pipeline checkpoints (generated, not source)
+.checkpoint-*.json
 
 __pycache__/
 *.pyc
+*.pyo
 .ipynb_checkpoints/
 
 .env
 venv/
-datasets/
+.venv/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.log
+
