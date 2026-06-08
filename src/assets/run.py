@@ -62,7 +62,7 @@ def parse_args() -> argparse.Namespace:
         description="Build page assets (images + OCR text) from raw PDF documents.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    p.add_argument("--engine", choices=["tesseract", "easyocr"], default="tesseract",
+    p.add_argument("--engine", choices=["tesseract", "easyocr", "doctr"], default="tesseract",
                    help="OCR engine to use")
     p.add_argument("--raw-data", default="data/raw_data",
                    help="Path to raw PDF directory, relative to the repository root")
@@ -84,7 +84,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--easyocr-langs", default="en",
                    help="Comma-separated EasyOCR language codes, e.g. 'en,pl'")
     p.add_argument("--no-gpu", action="store_true",
-                   help="Force CPU for EasyOCR (default: use GPU if available)")
+                   help="Force CPU for GPU-based engines (EasyOCR, Surya)")
     return p.parse_args()
 
 
@@ -101,12 +101,12 @@ def supervise(args: argparse.Namespace) -> None:
     """
     child_cmd = [
         sys.executable, str(Path(__file__).resolve()),
-        "--engine",      args.engine,
-        "--raw-data",    args.raw_data,
-        "--output",      args.output,
-        "--dpi",         str(args.dpi),
-        "--stop-after",  str(args.stop_after),
-        "--tess-lang",   args.tess_lang,
+        "--engine",        args.engine,
+        "--raw-data",      args.raw_data,
+        "--output",        args.output,
+        "--dpi",           str(args.dpi),
+        "--stop-after",    str(args.stop_after),
+        "--tess-lang",     args.tess_lang,
         "--easyocr-langs", args.easyocr_langs,
     ]
     if args.limit:
@@ -149,6 +149,9 @@ def build_ocr(args: argparse.Namespace):
         from services.easyocr_ocr import EasyOcrEngine
         langs = [l.strip() for l in args.easyocr_langs.split(",")]
         return EasyOcrEngine(langs=langs, gpu=not args.no_gpu)
+    if args.engine == "doctr":
+        from services.doctr_ocr import DocTROcrEngine
+        return DocTROcrEngine(gpu=not args.no_gpu)
     raise ValueError(f"Unknown engine: {args.engine}")
 
 

@@ -5,21 +5,11 @@ pymupdf>=1.24.0
 pillow>=10.0.0
 pydantic>=2.0.0
 numpy>=1.24.0
-
-# OCR — Tesseract (CPU)
-# System prerequisite (WSL/Ubuntu):
-#   sudo apt-get install tesseract-ocr tesseract-ocr-eng
 pytesseract>=0.3.10
-
-# OCR — EasyOCR (GPU via CUDA on RTX 4050)
 easyocr>=1.7.1
-
-# PyTorch — install the CUDA build BEFORE easyocr:
-#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+python-doctr[torch]>=0.8.0
 torch>=2.1.0
 torchvision>=0.16.0
-
-# Evaluation / notebooks
 pandas>=2.0.0
 matplotlib>=3.7.0
 tqdm>=4.66.0

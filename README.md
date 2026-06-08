@@ -20,14 +20,14 @@ src/assets/
     ├── base_ocr.py                 # Abstract OCR interface
     ├── tesseract_ocr.py            # Tesseract engine (CPU)
     ├── easyocr_ocr.py              # EasyOCR engine (GPU)
+    ├── doctr_ocr.py                # docTR engine (GPU, transformer-based)
     ├── asset_creator.py            # Orchestrates OCR + asset writing
     ├── asset_writer.py             # Saves images and OCR text to disk
     └── pdf_loader.py               # Discovers and validates raw PDFs
 
 notebooks/
 ├── 00_eda_poly_seq.ipynb           # Exploratory Data Analysis — DocSplit benchmark
-├── 01_create_assets.ipynb          # Asset creation pipeline (interactive)
-└── 02_ocr_evaluation.ipynb         # OCR engine comparison: quality & speed
+└── 01_ocr_evaluation.ipynb         # OCR engine comparison: quality & speed
 ```
 
 ## Data
@@ -45,20 +45,18 @@ Benchmark: [DocSplit](https://huggingface.co/datasets/amazon/doc_split) (Amazon,
 
 ## Running the OCR pipeline
 
-The pipeline is designed to run in **tmux** to survive VS Code disconnects,
-using a supervised mode that isolates memory between partitions:
+The pipeline runs in **tmux** to survive VS Code disconnects. Each engine uses
+a supervised mode that spawns isolated child processes to manage memory.
 
 ```bash
 # start a tmux session
 tmux new -s ocr
-
 cd page-stream-segmentation
 
-# run Tesseract (CPU)
+# step 1 — run all three engines (each resumes automatically from checkpoint)
 python src/assets/run.py --engine tesseract --supervise
-
-# run EasyOCR (GPU — RTX 4050)
-python src/assets/run.py --engine easyocr --supervise
+python src/assets/run.py --engine easyocr   --supervise
+python src/assets/run.py --engine doctr     --supervise
 
 # resume after a crash — checkpoint is loaded automatically
 python src/assets/run.py --engine tesseract --supervise
@@ -68,10 +66,17 @@ Key options:
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--engine` | `tesseract` | OCR engine: `tesseract` or `easyocr` |
+| `--engine` | `tesseract` | OCR engine: `tesseract`, `easyocr`, or `doctr` |
 | `--stop-after` | `30` | Documents per partition (reduce if OOM) |
 | `--dpi` | `200` | Page rendering DPI |
 | `--limit` | `None` | Cap total documents (useful for smoke tests) |
+
+## Evaluation
+
+After running all engines, open `notebooks/01_ocr_evaluation.ipynb` and
+**Restart & Run All**. The notebook benchmarks all three engines on a
+stratified sample (3 docs × 3 pages per document type) and produces five
+charts saved to `../data/ocr_eval/charts/`.
 
 ## Prerequisites
 
@@ -82,12 +87,13 @@ sudo apt-get install tesseract-ocr tesseract-ocr-eng
 # Python — install PyTorch with CUDA first
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
+pip install "numpy<2.0"   # required for docTR / EasyOCR ABI compatibility
 ```
 
 ## Progress
 
 - [x] EDA — DocSplit benchmark (poly_seq / large)
-- [x] OCR pipeline — Tesseract (CPU) & EasyOCR (GPU)
-- [x] OCR evaluation — speed, confidence
+- [x] OCR pipeline — Tesseract (CPU), EasyOCR (GPU), docTR (GPU, transformer-based)
+- [x] OCR evaluation — speed, confidence, CER
 - [ ] MLLM inference — Qwen VL (candidate) on DocSplit poly_seq
 - [ ] Results analysis & comparison
