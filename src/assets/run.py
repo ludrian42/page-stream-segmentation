@@ -62,7 +62,7 @@ def parse_args() -> argparse.Namespace:
         description="Build page assets (images + OCR text) from raw PDF documents.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    p.add_argument("--engine", choices=["tesseract", "easyocr", "doctr"], default="tesseract",
+    p.add_argument("--engine", choices=["tesseract", "easyocr", "doctr", "trocr", "parseq"], default="tesseract",
                    help="OCR engine to use")
     p.add_argument("--raw-data", default="data/raw_data",
                    help="Path to raw PDF directory, relative to the repository root")
@@ -152,6 +152,12 @@ def build_ocr(args: argparse.Namespace):
     if args.engine == "doctr":
         from services.doctr_ocr import DocTROcrEngine
         return DocTROcrEngine(gpu=not args.no_gpu)
+    if args.engine == "trocr":
+        from services.trocr_ocr import TrOCROcrEngine
+        return TrOCROcrEngine(gpu=not args.no_gpu)
+    if args.engine == "parseq":
+        from services.parseq_ocr import ParseqOcrEngine
+        return ParseqOcrEngine(gpu=not args.no_gpu)
     raise ValueError(f"Unknown engine: {args.engine}")
 
 

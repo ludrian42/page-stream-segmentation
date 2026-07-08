@@ -15,6 +15,9 @@ import argparse
 from pathlib import Path
 from loguru import logger
 
+# Repo root = magisterka/ (3 levels up from this file)
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+
 from services.asset_loader import AssetLoader
 from services.split_manager import SplitManager
 from services.benchmark_generator import BenchmarkGenerator
@@ -26,11 +29,11 @@ def main():
     parser = argparse.ArgumentParser(description='Create benchmarks from assets')
 
     # Paths
-    parser.add_argument('--assets-path', default='data/assets',
+    parser.add_argument('--assets-path', default=str(_REPO_ROOT / 'data' / 'assets'),
                        help='Path to assets from create_assets')
-    parser.add_argument('--output-path', default='data/benchmarks',
+    parser.add_argument('--output-path', default=str(_REPO_ROOT / 'data' / 'benchmarks'),
                        help='Output path for benchmarks')
-    parser.add_argument('--split-mapping', default='data/metadata/split_mapping.json',
+    parser.add_argument('--split-mapping', default=str(_REPO_ROOT / 'data' / 'metadata' / 'split_mapping.json'),
                        help='Path to split mapping JSON (created if not exists)')
 
     # Strategy

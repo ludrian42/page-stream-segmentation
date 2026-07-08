@@ -23,7 +23,8 @@ class AssetLoader:
         self.assets_path = Path(assets_path)
         
         if mapping_csv is None:
-            mapping_csv = "data/metadata/document_mapping.csv"
+            _repo_root = Path(__file__).resolve().parents[4]
+            mapping_csv = str(_repo_root / "data" / "metadata" / "document_mapping.csv")
         
         self.mapping_csv = Path(mapping_csv)
         
